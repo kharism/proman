@@ -1,0 +1,8 @@
+{
+    "uri":"mongodb://localhost",
+    "db":"proman",
+    "address":"localhost:8098",
+    "prometheus_path":"",
+    "prometheus_yaml":"D:\\bin\\prometheus\\prometheus.yml",
+    "jwt_expiration_duration":3600
+}

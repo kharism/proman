@@ -27,12 +27,12 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn
-        href="https://github.com/vuetifyjs/vuetify/releases/latest"
+      <v-btn v-if="$acl.check('isLogged')"
+        @click="logout"
         target="_blank"
         text
       >
-        <span class="mr-2">Latest Release</span>
+        <span class="mr-2" >Logout</span>
         <v-icon>fas fa-external-link-alt</v-icon>
       </v-btn>
     </v-app-bar>
@@ -47,7 +47,14 @@
 
 export default {
   name: 'App',
-
+  methods:{
+    async logout() {
+        this.$session.Clear();
+        //localStorage.setItem("dark", this.$vuetify.theme.dark);
+        this.$acl.change("public");
+        this.$router.push("/login");
+    }
+  },
   data: () => ({
     //
   }),

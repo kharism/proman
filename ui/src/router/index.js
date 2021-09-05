@@ -8,13 +8,23 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
+    meta: {
+      rule: 'isLogged'
+    }
   },
-  ,
   {
     path: '/login',
     name: 'Login',
-    component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue')
+    component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue'),
+    meta: {
+      rule: 'isPublic'
+    }
+  },
+  {
+    path: '/error',
+    name: 'Error',
+    component: () => import(/* webpackChunkName: "about" */ '../views/Error.vue')
   },
   {
     path: '/about',

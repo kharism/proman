@@ -9,11 +9,17 @@
   "dependencies": {
     "@babel/polyfill": "^7.4.4",
     "core-js": "^3.6.4",
+    "js-cookie": "^3.0.1",
+    "node-sass": "^4.12.0",
     "register-service-worker": "^1.7.1",
+    "sass": "^1.25.0",
+    "sass-loader": "^8.0.2",
     "vee-validate": "^3.3.0",
     "vue": "^2.6.11",
+    "vue-acl": "^4.1.10",
     "vue-router": "^3.2.0",
     "vuetify": "^2.4.0",
+    "vuetify-dialog": "^2.0.2",
     "vuex": "^3.4.0"
   },
   "devDependencies": {

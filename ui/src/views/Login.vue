@@ -70,16 +70,15 @@ export default {
           let data = res.data.Data;
           data.Role = data.Role?data.Role : "USER"
           // if (data.Group) data.Group = data.Group.Name;
-          this.$session.store(data);
+          this.$session.Save(data.Token);
           this.loading = false;
-          this.$acl.change(data.Role);
+          this.$acl.change("inside");
           this.$router.push("/");
         })
         .catch(err => {
-          this.$dialog.notify.error(err, {
-            ...this.app.notification
-          });
           this.loading = false;
+          this.$dialog.notify.error(err);
+          //this.loading = false;
         });
     }
   }
