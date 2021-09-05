@@ -52,7 +52,7 @@ export default {
         this.$session.Clear();
         //localStorage.setItem("dark", this.$vuetify.theme.dark);
         this.$acl.change("public");
-        this.$router.push("/login");
+        this.$router.push("/");
     }
   },
   data: () => ({

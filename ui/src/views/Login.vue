@@ -73,7 +73,7 @@ export default {
           this.$session.Save(data.Token);
           this.loading = false;
           this.$acl.change("inside");
-          this.$router.push("/");
+          this.$router.push("/dashboard");
         })
         .catch(err => {
           this.loading = false;

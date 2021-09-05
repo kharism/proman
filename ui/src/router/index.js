@@ -6,7 +6,7 @@ Vue.use(VueRouter)
 
 const routes = [
   {
-    path: '/',
+    path: '/dashboard',
     name: 'Home',
     component: Home,
     meta: {
@@ -14,7 +14,7 @@ const routes = [
     }
   },
   {
-    path: '/login',
+    path: '/',
     name: 'Login',
     component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue'),
     meta: {

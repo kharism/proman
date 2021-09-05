@@ -1,8 +1,10 @@
 package main
 
 import (
+	"io/ioutil"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/go-chi/chi"
 	chiMiddleware "github.com/go-chi/chi/middleware"
@@ -82,6 +84,34 @@ func main() {
 
 	})
 	r.Get("/metrics", metric)
+	staticRoute(r, "/js", "js")
+	staticRoute(r, "/img", "img")
+	staticRoute(r, "/css", "css")
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
+		//w.Write([]byte("welcome"))
+		content, err := ioutil.ReadFile("./index.html")
+		if err != nil {
+			w.Write([]byte(err.Error()))
+		}
+		w.Write(content)
+	})
+	r.Get("/manifest.json", func(w http.ResponseWriter, r *http.Request) {
+		//w.Write([]byte("welcome"))
+		content, err := ioutil.ReadFile("./manifest.json")
+		if err != nil {
+			w.Write([]byte(err.Error()))
+		}
+		w.Write(content)
+	})
+	r.Get("/service-worker.js", func(w http.ResponseWriter, r *http.Request) {
+		//w.Write([]byte("welcome"))
+		content, err := ioutil.ReadFile("./service-worker.js")
+		if err != nil {
+			w.Write([]byte(err.Error()))
+		}
+		w.Header().Add("content-type", "javscript")
+		w.Write(content)
+	})
 	walkFunc := func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
 		log.Debugf("[%s] %s", method, route)
 		return nil
@@ -101,4 +131,25 @@ func main() {
 func metric(w http.ResponseWriter, r *http.Request) {
 	returnDummy := []byte("my_dummy_metric 100")
 	w.Write(returnDummy)
+}
+
+// StaticRoute add static route to chi router
+func staticRoute(r chi.Router, routePath string, directoryPath string) {
+	if strings.ContainsAny(routePath, "{}*") {
+		panic("static route does not permit any URL parameters.")
+	}
+
+	if routePath != "/" && routePath[len(routePath)-1] != '/' {
+		r.Get(routePath, http.RedirectHandler(routePath+"/", 301).ServeHTTP)
+		routePath += "/"
+	}
+	routePath += "*"
+
+	root := http.Dir(directoryPath)
+	r.Get(routePath, func(w http.ResponseWriter, r *http.Request) {
+		rctx := chi.RouteContext(r.Context())
+		pathPrefix := strings.TrimSuffix(rctx.RoutePattern(), "/*")
+		fs := http.StripPrefix(pathPrefix, http.FileServer(root))
+		fs.ServeHTTP(w, r)
+	})
 }
