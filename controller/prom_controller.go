@@ -82,7 +82,7 @@ func (c *promRestController) SaveYaml(w http.ResponseWriter, r *http.Request) {
 		util.WriteJSONError(w, err)
 		return
 	}
-	log.Println(data)
+	//log.Println(data)
 	c.lock.Lock()
 	defer c.lock.Unlock()
 	yamlPath := viper.GetString("prometheus_yaml")

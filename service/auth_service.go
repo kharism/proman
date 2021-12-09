@@ -9,7 +9,7 @@ import (
 	"github.com/kharism/proman/model"
 	"github.com/kharism/proman/repository"
 	"github.com/kharism/proman/util"
-	//"kano/simwas/pkg/module/toolkit"
+	//"github.com/kharism/proman/pkg/module/toolkit"
 )
 
 const (
