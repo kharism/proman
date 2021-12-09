@@ -16,8 +16,8 @@ import (
 
 type IServer interface {
 	Count(filters ...*bson.M) (int64, error)
-	//Delete(filters ...*dbflex.Filter) error
-	//DeleteByID(id string) error
+	Delete(filters ...*bson.M) error
+	DeleteByID(id string) error
 	FindAll(param *BaseParam) ([]model.Server, error)
 	//FindAtasan(id string) ([]model.User, error)
 	//FindByID(id string) (model.User, error)
@@ -49,6 +49,43 @@ func (r *serverRepo) Count(filters ...*bson.M) (int64, error) {
 		return coll.CountDocuments(ctx, bson.D{})
 	}
 	return coll.CountDocuments(ctx, filters)
+}
+func (r *serverRepo) DeleteByID(id string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	mongoCli, err := r.client()
+	defer cancel()
+	if err != nil {
+		return err
+	}
+	defer mongoCli.Disconnect(ctx)
+	serverModel := model.Server{}
+	db := mongoCli.Database(viper.GetString("db"))
+	coll := db.Collection(serverModel.TableName())
+	_, err = coll.DeleteOne(ctx, bson.M{"_id": id})
+	return err
+}
+func (r *serverRepo) Delete(filters ...*bson.M) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	mongoCli, err := r.client()
+	defer cancel()
+	if err != nil {
+		return err
+	}
+	defer mongoCli.Disconnect(ctx)
+	serverModel := model.Server{}
+	db := mongoCli.Database(viper.GetString("db"))
+	coll := db.Collection(serverModel.TableName())
+	if filters == nil {
+		_, err := coll.DeleteMany(ctx, bson.D{})
+		if err != nil {
+			return err
+		}
+	}
+	_, err = coll.DeleteMany(ctx, filters)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 func (r *serverRepo) FindAll(param *BaseParam) ([]model.Server, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
@@ -122,7 +159,9 @@ func (r *serverRepo) Save(data model.Server) (model.Server, error) {
 		}
 		data.SetID([]interface{}{insertOneRes.InsertedID})
 	} else {
-		_, err = db.Collection(data.TableName()).ReplaceOne(ctx, bson.M{"_id": data.ID}, data)
+		upsert := true
+		option := options.ReplaceOptions{Upsert: &upsert}
+		_, err = db.Collection(data.TableName()).ReplaceOne(ctx, bson.M{"_id": data.ID}, data, &option)
 		if err != nil {
 			return model.Server{}, err
 		}

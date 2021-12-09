@@ -26,7 +26,7 @@ func TestCreateServer(t *testing.T) {
 
 		Convey("Try Save", func() {
 			for i := 0; i < 10; i++ {
-				serverModel.ID = ""
+				serverModel.ID = fmt.Sprintf("%d", i)
 				serverModel.Name = fmt.Sprintf("SSDSDD_%d", i)
 				serverModel.Path = "/dummy/path/"
 				serverModel.AccessorType = "Dummy"
@@ -58,6 +58,7 @@ func TestCreateServer(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(len(oneData), ShouldEqual, 1)
 			So(oneData[0].Name, ShouldEqual, "SSDSDD_1")
+			deleteKey := oneData[0].ID
 
 			//test paging
 			baseParam.Filter = bson.M{}
@@ -75,6 +76,20 @@ func TestCreateServer(t *testing.T) {
 			pp, err := nextData[0].Accessor.ReadData(&nextData[0])
 			So(err, ShouldBeNil)
 			So(pp, ShouldEqual, fmt.Sprintf("dummy:///%s", nextData[0].Path))
+
+			//test delete
+			err = serverRepo.DeleteByID(deleteKey)
+			So(err, ShouldBeNil)
+
+			filter = bson.M{}
+			filter["_id"] = deleteKey
+
+			baseParam.Filter = filter
+			baseParam.Skip = 0
+			baseParam.Limit = 0
+			oneData, err = serverRepo.FindAll(&baseParam)
+			So(err, ShouldBeNil)
+			So(len(oneData), ShouldEqual, 0)
 		})
 
 	})
