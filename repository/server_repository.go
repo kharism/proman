@@ -15,8 +15,8 @@ import (
 )
 
 type IServer interface {
-	Count(filters ...*bson.M) (int64, error)
-	Delete(filters ...*bson.M) error
+	Count(filters *bson.M) (int64, error)
+	Delete(filters *bson.M) error
 	DeleteByID(id string) error
 	FindAll(param *BaseParam) ([]model.Server, error)
 	//FindAtasan(id string) ([]model.User, error)
@@ -34,7 +34,7 @@ func NewServer() IServer {
 		client: db.NewClient,
 	}
 }
-func (r *serverRepo) Count(filters ...*bson.M) (int64, error) {
+func (r *serverRepo) Count(filters *bson.M) (int64, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	mongoCli, err := r.client()
 	defer cancel()
@@ -64,7 +64,7 @@ func (r *serverRepo) DeleteByID(id string) error {
 	_, err = coll.DeleteOne(ctx, bson.M{"_id": id})
 	return err
 }
-func (r *serverRepo) Delete(filters ...*bson.M) error {
+func (r *serverRepo) Delete(filters *bson.M) error {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	mongoCli, err := r.client()
 	defer cancel()

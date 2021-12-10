@@ -36,7 +36,7 @@ func TestCreateServer(t *testing.T) {
 				So(serverModel.ID, ShouldNotBeEmpty)
 			}
 
-			count, err := serverRepo.Count()
+			count, err := serverRepo.Count(nil)
 
 			So(err, ShouldBeNil)
 			So(count, ShouldEqual, 10)
@@ -73,16 +73,21 @@ func TestCreateServer(t *testing.T) {
 			So(nextData[0].Name, ShouldEqual, "SSDSDD_2")
 			So(nextData[1].Name, ShouldEqual, "SSDSDD_3")
 
-			pp, err := nextData[0].Accessor.ReadData(&nextData[0])
+			pp, err := nextData[0].ReadData()
 			So(err, ShouldBeNil)
 			So(pp, ShouldEqual, fmt.Sprintf("dummy:///%s", nextData[0].Path))
+
+			filter = bson.M{}
+			filter["_id"] = deleteKey
+
+			//test count
+			count, err = serverRepo.Count(&filter)
+			So(err, ShouldBeNil)
+			So(count, ShouldEqual, 1)
 
 			//test delete
 			err = serverRepo.DeleteByID(deleteKey)
 			So(err, ShouldBeNil)
-
-			filter = bson.M{}
-			filter["_id"] = deleteKey
 
 			baseParam.Filter = filter
 			baseParam.Skip = 0
@@ -90,6 +95,15 @@ func TestCreateServer(t *testing.T) {
 			oneData, err = serverRepo.FindAll(&baseParam)
 			So(err, ShouldBeNil)
 			So(len(oneData), ShouldEqual, 0)
+
+			//test delete all
+			filter = bson.M{}
+			err = serverRepo.Delete(&filter)
+			So(err, ShouldBeNil)
+
+			count, err = serverRepo.Count(nil)
+			So(err, ShouldBeNil)
+			So(count, ShouldEqual, 0)
 		})
 
 	})

@@ -24,6 +24,12 @@ func (m *Server) GetPath() string {
 func (m *Server) TableName() string {
 	return "Server"
 }
+func (m *Server) ReadData() (string, error) {
+	return m.Accessor.ReadData(m)
+}
+func (m *Server) WriteData(s string) error {
+	return m.Accessor.WriteData(m, s)
+}
 func (m *Server) SetID(values []interface{}) {
 	id := values[0]
 	if v, ok := id.(string); ok {
